@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-streamlit
-pandas
-fuzzywuzzy
-python-Levenshtein
-openpyxl
-=======
-streamlit
-pandas
-fuzzywuzzy
-python-Levenshtein
-openpyxl
->>>>>>> b5206aa3c62687945e8cd57fd80113e8eb371691
+pandas==2.3.0
+streamlit==1.46.1
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.27.1
+openpyxl==3.1.5
