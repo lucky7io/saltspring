@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import streamlit as st
 import pandas as pd
 import base64
@@ -21,7 +20,10 @@ if st.get_option("theme.base") == "dark":
 else:
     logo_path = logo_white_path
 
-st.image(logo_path, width=300)
+try:
+    st.image(logo_path, width=300)
+except FileNotFoundError:
+    st.warning(f"Logo file `{logo_path}` not found. Please check your folder.")
 
 # --- TITLE & INTRO ---
 st.markdown(
@@ -52,35 +54,39 @@ uploaded_file = st.file_uploader(
     type=['xlsx', 'csv']
 )
 
-if uploaded_file:
-    # Load file
-    if uploaded_file.name.endswith('.csv'):
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
 
-    st.success("File uploaded successfully! ✅")
-    st.markdown("### Preview of Uploaded Data:")
-    st.dataframe(df.head(), use_container_width=True)
+        st.success("File uploaded successfully! ✅")
 
-    # Data cleaning example: lowercase column names
-    cleaned_df = df.copy()
-    cleaned_df.columns = [col.lower().strip() for col in cleaned_df.columns]
+        st.markdown("### Preview of Uploaded Data:")
+        st.dataframe(df.head(), use_container_width=True)
 
-    st.markdown("---")
-    st.markdown("### Preview of Cleaned Data:")
-    st.dataframe(cleaned_df.head(), use_container_width=True)
+        # Data cleaning example: lowercase column names
+        cleaned_df = df.copy()
+        cleaned_df.columns = [col.lower().strip() for col in cleaned_df.columns]
 
-    # Create downloadable CSV
-    csv = cleaned_df.to_csv(index=False).encode("utf-8")
+        st.markdown("---")
+        st.markdown("### Preview of Cleaned Data:")
+        st.dataframe(cleaned_df.head(), use_container_width=True)
 
-    st.download_button(
-        label="📥 Download Cleaned CSV",
-        data=csv,
-        file_name="cleaned_data.csv",
-        mime="text/csv",
-        use_container_width=True,
-    )
+        # Create downloadable CSV
+        csv = cleaned_df.to_csv(index=False).encode("utf-8")
+
+        st.download_button(
+            label="📥 Download Cleaned CSV",
+            data=csv,
+            file_name="cleaned_data.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
+    except Exception as e:
+        st.error(f"❌ Error reading file: {e}")
 
 else:
     st.info("Upload a file above to start.")
@@ -95,51 +101,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-=======
-import streamlit as st
-import pandas as pd
-
-# Page title and layout
-st.set_page_config(page_title="Salt Spring Data Upload", layout="centered")
-
-st.title("Salt Spring Data Services")
-st.subheader("Upload Your Customer or Listing Data")
-
-# File uploader
-uploaded_file = st.file_uploader(
-    "Choose an Excel or CSV file",
-    type=['csv', 'xlsx']
-)
-
-if uploaded_file is not None:
-    # Read file into DataFrame
-    try:
-        if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
-        else:
-            df = pd.read_excel(uploaded_file)
-        
-        st.success("File uploaded successfully!")
-        st.write("Here’s a preview of your data:")
-        st.dataframe(df.head())
-
-        # Simulate "cleaning" by converting all headers to lowercase
-        cleaned_df = df.copy()
-        cleaned_df.columns = [col.lower() for col in cleaned_df.columns]
-
-        st.write("Sample cleaned data (headers lowercased):")
-        st.dataframe(cleaned_df.head())
-
-        # Let user download the cleaned file
-        csv = cleaned_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Cleaned File",
-            data=csv,
-            file_name='cleaned_data.csv',
-            mime='text/csv'
-        )
-    except Exception as e:
-        st.error(f"Error reading file: {e}")
-else:
-    st.info("Please upload a file to begin.")
->>>>>>> b5206aa3c62687945e8cd57fd80113e8eb371691
