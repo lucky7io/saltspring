@@ -1,0 +1,85 @@
+import streamlit as st
+import pandas as pd
+
+# PAGE CONFIG
+st.set_page_config(page_title="Salt Spring Data Services", layout="centered")
+
+# HEADER
+st.title("Salt Spring Data Services")
+st.subheader("Upload Your Customer or Listing Data")
+
+# 🔶 BANNER FOR LEAD MAGNET
+st.info("""
+🚀 **Need advanced help cleaning your data?**
+Salt Spring Data Services offers:
+- Deduplication & fuzzy matching
+- Data enrichment
+- Large-file cleaning
+
+[👉 Click here to request a quote](https://calendly.com/yourusername/30min)
+""")
+
+# EMAIL CAPTURE BOX
+email = st.text_input("Leave your email for a free quote or consultation:")
+if email:
+    st.success(f"Thanks! We'll reach out to {email}.")
+
+# FILE UPLOADER
+uploaded_file = st.file_uploader("Choose an Excel or CSV file", type=['csv', 'xlsx'])
+
+if uploaded_file is not None:
+    # READ FILE
+    if uploaded_file.name.endswith('.csv'):
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = pd.read_excel(uploaded_file)
+
+    st.success("✅ File uploaded successfully!")
+    st.write("Here’s a preview of your data:")
+
+    # ⭐ LIMIT PREVIEW TO 100 ROWS
+    FREE_ROW_LIMIT = 100
+    if len(df) > FREE_ROW_LIMIT:
+        st.warning(f"⚠️ Free preview is limited to {FREE_ROW_LIMIT} rows. Want the entire file cleaned? Hire us!")
+        preview_df = df.head(FREE_ROW_LIMIT)
+    else:
+        preview_df = df
+
+    st.dataframe(preview_df)
+
+    # SIMPLE CLEANING: LOWERCASE HEADERS
+    cleaned_df = preview_df.copy()
+    cleaned_df.columns = [col.lower() for col in cleaned_df.columns]
+
+    st.write("Sample cleaned data (headers lowercased):")
+    st.dataframe(cleaned_df)
+
+    # DOWNLOAD BUTTON FOR CLEANED PREVIEW
+    csv = cleaned_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Cleaned Preview (CSV)",
+        data=csv,
+        file_name='cleaned_data_preview.csv',
+        mime='text/csv',
+    )
+
+    # 🔶 CTA BUTTON FOR PAID SERVICE
+    if st.button("Request Full Data Cleaning or Custom Service"):
+        st.write("""
+        ✅ Awesome! Please [book a call here](https://calendly.com/yourusername/30min)
+        or email us at **youremail@example.com** and we'll help clean your entire file!
+        """)
+else:
+    st.info("Please upload a file to begin.")
+
+# OPTIONAL: Service Description
+st.markdown("""
+---
+### 💼 What We Do
+- Clean large or complex files
+- Remove duplicates using fuzzy matching
+- Standardize messy text fields
+- Enrich customer lists with new data
+
+Typical jobs start from $50. Get a custom quote today!
+""")
